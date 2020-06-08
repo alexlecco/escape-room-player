@@ -1,26 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import ReactCountdownClock from 'react-countdown-clock'
+import firebase from './firestore'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { time: 0 }
+
+    this.room1Ref = firebase.firestore().collection('room1').doc('glYViwyAivdHSVtoljZN')
+  }
+
+  componentDidMount() {
+    this.listenUpdater(this.room1Ref)
+  }
+
+  listenUpdater(ref) {
+    ref.onSnapshot(function(doc) {
+      const startValue = doc.data().start
+      const penalizeValue = doc.data().penalization
+      penalizeValue ? this.penalize() : startValue ? this.start() : this.reset()
+    }.bind(this))
+  }
+
+  myCallback() { console.log("tiempo cumplido") } 
+  start() {this.setState({time: 3600})}
+  reset() {this.setState({time: 0})}
+  penalize() {this.setState({time: 300})}
+
+  render() {
+    const { time } = this.state
+
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1> Bienvenido a Escape Room Tucumán </h1>
+          <h2> PLAYER </h2>
+          <p> tiempo restante: </p>
+          <div style={{textAlign: 'left'}}>
+            <ReactCountdownClock
+              seconds={time}
+              color="#34ebab"
+              alpha={0.9}
+              size={200}
+              onComplete={() => this.myCallback()}
+            />
+          </div>
+        </header>
+      </div>
+    )
+  }
 }
-
-export default App;
