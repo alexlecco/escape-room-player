@@ -6,7 +6,10 @@ import firebase from './firestore'
 export default class App extends Component {
   constructor(props) {
     super(props)
-    this.state = { time: 0 }
+    this.state = {
+      time: 0,
+      clockColor: "#34ebab"
+    }
 
     this.room1Ref = firebase.firestore().collection('room1').doc('glYViwyAivdHSVtoljZN')
   }
@@ -24,12 +27,13 @@ export default class App extends Component {
   }
 
   myCallback() { console.log("tiempo cumplido") } 
-  start() {this.setState({time: 3600})}
-  reset() {this.setState({time: 0})}
-  penalize() {this.setState({time: 300})}
+  start() {this.setState({time: 3600, clockColor: "#34ebab"})}
+  reset() {this.setState({time: 0, clockColor: "#34ebab"})}
+  penalize() {this.setState({time: 300, clockColor: "#ff004c"})}
 
   render() {
     const { time } = this.state
+    const { clockColor } = this.state
 
     return (
       <div className="App">
@@ -40,7 +44,7 @@ export default class App extends Component {
           <div style={{textAlign: 'left'}}>
             <ReactCountdownClock
               seconds={time}
-              color="#34ebab"
+              color={clockColor}
               alpha={0.9}
               size={200}
               onComplete={() => this.myCallback()}
