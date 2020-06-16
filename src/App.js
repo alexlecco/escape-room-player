@@ -3,7 +3,7 @@ import './App.css';
 import startSoundLoc from './sounds/start.wav'
 import penalizeSoundLoc from './sounds/penalize.wav'
 import timeoverSoundLoc from './sounds/timeover.wav'
-import checkpointSoundLoc from './sounds/checkpoint.wav' // no usado aun
+//import checkpointSoundLoc from './sounds/checkpoint.wav' // no usado aun
 import ReactCountdownClock from 'react-countdown-clock'
 import firebase from './firestore'
 
@@ -13,7 +13,8 @@ export default class App extends Component {
     this.state = {
       time: 0,
       clockColor: '#34ebab',
-      isActive: false
+      isActive: false,
+      isPaused: false
     }
 
     this.room1Ref = firebase.firestore().collection('room1').doc('glYViwyAivdHSVtoljZN')
@@ -26,8 +27,12 @@ export default class App extends Component {
   listenUpdater(ref) {
     ref.onSnapshot(function(doc) {
       const startValue = doc.data().start
-      const penalizeValue = doc.data().penalization
-      penalizeValue ? this.penalize() : startValue ? this.start() : this.reset()
+      const isPenalizedValue = doc.data().isPenalized
+      const isPausedValue = doc.data().isPaused
+
+      isPausedValue ? this.pause(true) : this.pause(false)
+
+      isPenalizedValue ? this.penalize() : startValue ? this.start() : this.reset()
     }.bind(this))
   }
 
@@ -35,12 +40,12 @@ export default class App extends Component {
     let sound = new Audio(timeoverSoundLoc)
     if(this.state.isActive) sound.play()
     this.setState({time: 0, clockColor: '#34ebab'})
-    this.room1Ref.update({ "start": false, "penalization": false })
+    this.room1Ref.update({ 'start': false, 'isPenalized': false })
   }
 
   start() {
     let sound = new Audio(startSoundLoc)
-    sound.play()
+    if(!this.state.isPaused) sound.play()
     this.setState({
       time: 3600,
       clockColor: '#34ebab',
@@ -48,16 +53,20 @@ export default class App extends Component {
     })
   }
 
+  pause(isPausedValue) {
+    this.setState({ isPaused: isPausedValue })
+  }
+
   penalize() {
     let sound = new Audio(penalizeSoundLoc)
-    sound.play()
+    if(!this.state.isPaused) sound.play()
     this.setState({time: 300, clockColor: '#ff004c'})
   }
 
   reset() {this.setState({time: 0, clockColor: '#34ebab'})}
   
   render() {
-    const { time } = this.state
+    const { time, isPaused } = this.state
     const { clockColor } = this.state
     const handleOnComplete = () => this.myCallback()
 
@@ -65,7 +74,7 @@ export default class App extends Component {
       <div className='App'>
         <header className='App-header'>
           <h1> Bienvenido a Escape Room Tucumán </h1>
-          <h2> PLAYER </h2>
+          <h2> PLAYER {isPaused ? 'pausado' : ''} </h2>
           <p> tiempo restante: </p>
           <div style={{textAlign: 'left'}}>
             <ReactCountdownClock
@@ -73,6 +82,7 @@ export default class App extends Component {
               color={clockColor}
               alpha={0.9}
               size={200}
+              paused={isPaused}
               onComplete={handleOnComplete}
             />
           </div>
