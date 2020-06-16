@@ -24,6 +24,10 @@ export default class App extends Component {
     this.listenUpdater(this.room1Ref)
   }
 
+  componentWillUnmount() {
+    this.room1Ref.update({ 'start': false, 'isPenalized': false, 'isPaused': false })
+  }
+
   listenUpdater(ref) {
     ref.onSnapshot(function(doc) {
       const startValue = doc.data().start
@@ -66,15 +70,14 @@ export default class App extends Component {
   reset() {this.setState({time: 0, clockColor: '#34ebab'})}
   
   render() {
-    const { time, isPaused } = this.state
-    const { clockColor } = this.state
+    const { time, isPaused, isActive, clockColor } = this.state
     const handleOnComplete = () => this.myCallback()
 
     return (
       <div className='App'>
         <header className='App-header'>
           <h1> Bienvenido a Escape Room Tucumán </h1>
-          <h2> PLAYER {isPaused ? 'pausado' : ''} </h2>
+          <h2> {isPaused ? 'pausado' : ''} </h2>
           <p> tiempo restante: </p>
           <div style={{textAlign: 'left'}}>
             <ReactCountdownClock
