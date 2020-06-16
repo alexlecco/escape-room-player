@@ -43,7 +43,7 @@ export default class App extends Component {
   myCallback() {
     let sound = new Audio(timeoverSoundLoc)
     if(this.state.isActive) sound.play()
-    this.setState({time: 0, clockColor: '#34ebab'})
+    this.setState({time: 0, clockColor: '#34ebab', isActive: false})
     this.room1Ref.update({ 'start': false, 'isPenalized': false })
   }
 
@@ -67,10 +67,10 @@ export default class App extends Component {
     this.setState({time: 300, clockColor: '#ff004c'})
   }
 
-  reset() {this.setState({time: 0, clockColor: '#34ebab'})}
+  reset() {this.setState({time: 0, clockColor: '#34ebab', isActive: false})}
   
   render() {
-    const { time, isPaused, isActive, clockColor } = this.state
+    const { time, isPaused, clockColor, isActive } = this.state
     const handleOnComplete = () => this.myCallback()
 
     return (
@@ -78,7 +78,7 @@ export default class App extends Component {
         <header className='App-header'>
           <h1> Bienvenido a Escape Room Tucumán </h1>
           <h2> {isPaused ? 'pausado' : ''} </h2>
-          <p> tiempo restante: </p>
+          {isActive && <p> tiempo restante: </p>}
           <div style={{textAlign: 'left'}}>
             <ReactCountdownClock
               seconds={time}
