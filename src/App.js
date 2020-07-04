@@ -34,15 +34,13 @@ export default class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1> Bienvenido a Escape Room Tucumán </h1>
-          <h2> PLAYER </h2>
           <p> tiempo restante: </p>
           <div style={{textAlign: 'left'}}>
             <ReactCountdownClock
               seconds={time}
               color="#34ebab"
               alpha={0.9}
-              size={200}
+              size={350}
               onComplete={() => this.myCallback()}
             />
           </div>
